@@ -33,12 +33,15 @@ get_gem_dir['rbx-1'] = File.join '1.8', 'gems'
 #TODO: need specs for other rubys!
 get_bin_dir = Hash.new 'bin'
 
-src_gem_dir  = RBENV_VERSIONS.join src_ver, get_gem_dir[src_ver]
-dest_gem_dir = File.dirname( RBENV_VERSIONS.join dest_ver, get_gem_dir[dest_ver] )
+src_gem_group  = get_gem_dir_group src_ver
+dest_gem_group = get_gem_dir_group dest_ver
+
+src_gem_dir  = RBENV_VERSIONS.join src_ver, get_gem_dir[src_gem_group]
+dest_gem_dir = File.dirname( RBENV_VERSIONS.join dest_ver, get_gem_dir[src_gem_group] )
 FileUtils.cp_r src_gem_dir, dest_gem_dir, COPY_OPTS
 
-src_bin_dir  = RBENV_VERSIONS.join src_ver, get_bin_dir[src_ver]
-dest_bin_dir = RBENV_VERSIONS.join dest_ver, get_bin_dir[dest_ver]
+src_bin_dir  = RBENV_VERSIONS.join src_ver, get_bin_dir[src_gem_group]
+dest_bin_dir = RBENV_VERSIONS.join dest_ver, get_bin_dir[dest_gem_group]
 bins_to_copy = (
   Dir.entries( src_bin_dir ) - Dir.entries( dest_bin_dir )
 ).map {|bin| File.join src_bin_dir, bin }
