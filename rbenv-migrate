@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+# -*- coding: utf-8 -*-
+$VERBOSE = true
+=begin
+Copy gems to some of the .rbenv/versions from the other
+=end
+
+require 'fileutils'
+
+RBENV_VERSIONS = File.join ENV['HOME'], '.rbenv', 'versions', 
+class << RBENV_VERSIONS
+  def join *paths
+    File.join self, *paths
+  end
+end
+
+GEM_DIR_GROUPS = %w/ 1.8 1.9 2.0 jruby maglev rbx-1 rbx-2 ree /
+
+def get_gem_dir_group version
+  GEM_DIR_GROUPS.find {|group| group.start_with? version }
+end
+
+COPY_OPTS = { :verbose => true, :noop => true }
+
+src_ver, dest_ver = ARGV[0..1]
+
+#TODO: need specs for other rubys!
+get_gem_dir = Hash.new 'gems'
+get_gem_dir['1.8']   = File.join 'lib', 'ruby', 'gems', '1.8', 'gems'
+get_gem_dir['1.9']   = File.join 'lib', 'ruby', 'gems'
+get_gem_dir['rbx-1'] = File.join '1.8', 'gems'
+
+#TODO: need specs for other rubys!
+get_bin_dir = Hash.new 'bin'
+
+src_gem_dir  = RBENV_VERSIONS.join src_ver, get_gem_dir[src_ver]
+dest_gem_dir = File.dirname( RBENV_VERSIONS.join dest_ver, get_gem_dir[dest_ver] )
+FileUtils.cp_r src_gem_dir, dest_gem_dir, COPY_OPTS
+
+src_bin_dir  = RBENV_VERSIONS.join src_ver, get_bin_dir[src_ver]
+dest_bin_dir = RBENV_VERSIONS.join dest_ver, get_bin_dir[dest_ver]
+bins_to_copy = (
+  Dir.entries( src_bin_dir ) - Dir.entries( dest_bin_dir )
+).map {|bin| File.join src_bin_dir, bin }
+FileUtils.cp_r bins_to_copy, dest_bin_dir, COPY_OPTS
