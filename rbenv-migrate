@@ -7,7 +7,7 @@ Copy gems to some of the .rbenv/versions from the other
 
 require 'fileutils'
 
-RBENV_VERSIONS = File.join ENV['HOME'], '.rbenv', 'versions', 
+RBENV_VERSIONS = File.join ENV['HOME'], '.rbenv', 'versions'
 class << RBENV_VERSIONS
   def join *paths
     File.join self, *paths
